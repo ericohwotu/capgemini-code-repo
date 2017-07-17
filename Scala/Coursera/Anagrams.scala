@@ -108,9 +108,19 @@ object Anagrams {
     * and has no zero-entries.
     */
   def subtract(x: Occurrences, y: Occurrences): Occurrences = {
-      if(y.isEmpty) x
-      else subtract(x.patch(x.indexOf(y.head), List(), 1),y.tail)
+    def iter (a: Occurrences, b: Occurrences)(c: Occurrences): Occurrences = {
+      if (b.isEmpty) a
+      else if (a.isEmpty) iter(c, b.tail)(List())
+      else if (b.head._1 == a.head._1 && b.head._2 == a.head._2) iter(a.tail, b)(c)
+      else if (b.head._1 == a.head._1 && b.head._2 < a.head._2) iter(a.tail, b)(c :+ (a.head._1,a.head._2 - b.head._2))
+      else iter(a.tail,b)(c :+ (a.head._1,a.head._2))
+    }
+    iter(x,y)(List())
   }
+
+  //      if(y.isEmpty) x
+  //      else subtract(x.patch(x.indexOf(y.head), List(), 1),y.tail)
+  //  }
 
   /** Returns a list of all anagram sentences of the given sentence.
     *
@@ -153,11 +163,11 @@ object Anagrams {
     * Note: There is only one anagram of an empty sentence.
     */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-//    println(sentence)
-//    println(sentence.mkString("").combinations(2).toList)
+    //    println(sentence)
+    //    println(sentence.mkString("").combinations(2).toList)
 
     def sub(occurrences: Occurrences): List[Sentence] ={
-//      println(combinations(occurrences))
+      //      println(combinations(occurrences))
       if(occurrences.isEmpty)List(Nil)
       else {
         for {
